@@ -1,32 +1,29 @@
 package net.sourceforge.opencamera;
 
-import net.sourceforge.opencamera.cameracontroller.CameraController;
-import net.sourceforge.opencamera.cameracontroller.CameraControllerManager2;
-import net.sourceforge.opencamera.preview.Preview;
-import net.sourceforge.opencamera.preview.VideoProfile;
-import net.sourceforge.opencamera.remotecontrol.BluetoothRemoteControl;
-import net.sourceforge.opencamera.ui.FolderChooserDialog;
-import net.sourceforge.opencamera.ui.MainUI;
-import net.sourceforge.opencamera.ui.ManualSeekbars;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -42,30 +39,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.animation.ArgbEvaluator;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.app.KeyguardManager;
-import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.renderscript.RenderScript;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -85,8 +63,39 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.ZoomControls;
 
+import com.google.android.play.core.splitinstall.SplitInstallManager;
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory;
+import com.google.android.play.core.splitinstall.SplitInstallRequest;
+import com.google.android.play.core.tasks.OnCompleteListener;
+import com.google.android.play.core.tasks.OnFailureListener;
+import com.google.android.play.core.tasks.OnSuccessListener;
+import com.google.android.play.core.tasks.Task;
+
+import net.sourceforge.opencamera.cameracontroller.CameraController;
+import net.sourceforge.opencamera.cameracontroller.CameraControllerManager2;
+import net.sourceforge.opencamera.preview.Preview;
+import net.sourceforge.opencamera.preview.VideoProfile;
+import net.sourceforge.opencamera.remotecontrol.BluetoothRemoteControl;
+import net.sourceforge.opencamera.ui.FolderChooserDialog;
+import net.sourceforge.opencamera.ui.MainUI;
+import net.sourceforge.opencamera.ui.ManualSeekbars;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 /** The main Activity for Open Camera.
  */
+
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
@@ -94,12 +103,19 @@ public class MainActivity extends Activity {
 
     private SensorManager mSensorManager;
     private Sensor mSensorAccelerometer;
-
+    private SplitInstallManager splitInstallManager;
+    private SplitInstallRequest splitInstallRequestGallery;
+    private SplitInstallRequest splitInstallRequestAudioControl;
+    private SplitInstallRequest splitInstallRequestStampPhoto;
+    private Map<String, SplitInstallRequest> requestMap;
+    String DYNAMIC_FEATURE_Gallery = "Gallery";
+    String DYNAMIC_FEATURE_AudioControl = "AudioControl";
+    String DYNAMIC_FEATURE_StampPhoto = "StampPhoto";
     // components: always non-null (after onCreate())
     private BluetoothRemoteControl bluetoothRemoteControl;
     private PermissionHandler permissionHandler;
     private SettingsManager settingsManager;
-    private MainUI mainUI;
+    public MainUI mainUI;
     private ManualSeekbars manualSeekbars;
     private MyApplicationInterface applicationInterface;
     private TextFormatter textFormatter;
@@ -107,7 +123,7 @@ public class MainActivity extends Activity {
     private MagneticSensor magneticSensor;
     private SpeechControl speechControl;
 
-    private Preview preview;
+    public Preview preview;
     private OrientationEventListener orientationEventListener;
     private int large_heap_memory;
     private boolean supports_auto_stabilise;
@@ -169,9 +185,18 @@ public class MainActivity extends Activity {
     private static final float WATER_DENSITY_FRESHWATER = 1.0f;
     private static final float WATER_DENSITY_SALTWATER = 1.03f;
     private float mWaterDensity = 1.0f;
+    public static class SecondClass {
+        public static WeakReference<Activity> mActivityRef;
+
+        public static void updateActivity(Activity activity) {
+            mActivityRef = new WeakReference<Activity>(activity);
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         long debug_time = 0;
         if( MyDebug.LOG ) {
             Log.d(TAG, "onCreate: " + this);
@@ -181,7 +206,8 @@ public class MainActivity extends Activity {
         if( MyDebug.LOG )
             Log.d(TAG, "activity_count: " + activity_count);
         super.onCreate(savedInstanceState);
-
+        Intent intent = new Intent().setClassName(this,"net.sourceforge.opencamera.MonitorService");
+        startService(intent);
         if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ) {
             // don't show orientation animations
             WindowManager.LayoutParams layout = getWindow().getAttributes();
@@ -211,7 +237,7 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "shortcut: " + getIntent().getAction());
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
+        SecondClass.updateActivity(this);
         // determine whether we should support "auto stabilise" feature
         // risk of running out of memory on lower end devices, due to manipulation of large bitmaps
         ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -248,7 +274,7 @@ public class MainActivity extends Activity {
         soundPoolManager = new SoundPoolManager(this);
         magneticSensor = new MagneticSensor(this);
         speechControl = new SpeechControl(this);
-
+        requestMap = new HashMap<>();
         // determine whether we support Camera2 API
         initCamera2Support();
 
@@ -369,6 +395,7 @@ public class MainActivity extends Activity {
         });
 
         // set up gallery button long click
+        initDynamicModules();
         View galleryButton = findViewById(R.id.gallery);
         galleryButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -505,6 +532,7 @@ public class MainActivity extends Activity {
                 // We set the latest_version whether or not the dialog is shown - if we showed the first time dialog, we don't
                 // want to then show the What's New dialog next time we run! Similarly if the user had disabled showing the dialog,
                 // but then enables it, we still shouldn't show the dialog until the new time Open Camera upgrades.
+
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt(PreferenceKeys.LatestVersionPreferenceKey, version_code);
                 editor.apply();
@@ -608,6 +636,52 @@ public class MainActivity extends Activity {
 		}*/
     }
 
+    private void initDynamicModules(){
+        splitInstallManager = SplitInstallManagerFactory.create(this);
+        splitInstallRequestGallery = SplitInstallRequest
+                .newBuilder()
+                .addModule(DYNAMIC_FEATURE_Gallery)
+                .build();
+        splitInstallRequestAudioControl = SplitInstallRequest
+                .newBuilder()
+                .addModule(DYNAMIC_FEATURE_AudioControl)
+                .build();
+        splitInstallRequestStampPhoto = SplitInstallRequest
+                .newBuilder()
+                .addModule(DYNAMIC_FEATURE_StampPhoto)
+                .build();
+
+
+        requestMap.put(DYNAMIC_FEATURE_Gallery,splitInstallRequestGallery);
+        requestMap.put(DYNAMIC_FEATURE_AudioControl,splitInstallRequestAudioControl);
+        requestMap.put(DYNAMIC_FEATURE_StampPhoto, splitInstallRequestStampPhoto);
+    }
+
+    public Boolean isDynamicFeatureDownloaded(String feature)
+    {
+        return splitInstallManager.getInstalledModules().contains(feature);
+    }
+
+    public void downloadFeature(String feature){
+        splitInstallManager.startInstall(requestMap.get(feature)).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Integer>() {
+            @Override
+            public void onSuccess(Integer result) {
+
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Integer>() {
+            @Override
+            public void onComplete(Task<Integer> task) {
+
+            }
+        });
+    }
+
+
     /** Switches modes if required, if called from a relevant intent/tile.
      */
     private void setModeFromIntents(Bundle savedInstanceState) {
@@ -650,7 +724,8 @@ public class MainActivity extends Activity {
         else if( ACTION_SHORTCUT_GALLERY.equals(action) ) {
             if( MyDebug.LOG )
                 Log.d(TAG, "launching from application shortcut for Open Camera: gallery");
-            openGallery();
+            Intent intent = new Intent().setClassName(this,"com.example.gallery.GalleryActivity");
+            this.startActivity(intent);
         }
         else if( ACTION_SHORTCUT_SETTINGS.equals(action) ) {
             if( MyDebug.LOG )
@@ -894,7 +969,7 @@ public class MainActivity extends Activity {
     /* Audio trigger - either loud sound, or speech recognition.
      * This performs some additional checks before taking a photo.
      */
-    void audioTrigger() {
+    public void audioTrigger() {
         if( MyDebug.LOG )
             Log.d(TAG, "ignore audio trigger due to popup open");
         if( popupIsOpen() ) {
@@ -993,6 +1068,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onResume() {
+        Log.d(TAG,"onresume");
         long debug_time = 0;
         if( MyDebug.LOG ) {
             Log.d(TAG, "onResume");
@@ -1265,17 +1341,17 @@ public class MainActivity extends Activity {
             Log.d(TAG, "clickedStamp");
 
         this.closePopup();
+            boolean value = applicationInterface.getStampPref().equals("preference_stamp_yes");
+            value = !value;
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(PreferenceKeys.StampPreferenceKey, value ? "preference_stamp_yes" : "preference_stamp_no");
+            editor.apply();
 
-        boolean value = applicationInterface.getStampPref().equals("preference_stamp_yes");
-        value = !value;
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(PreferenceKeys.StampPreferenceKey, value ? "preference_stamp_yes" : "preference_stamp_no");
-        editor.apply();
+            mainUI.updateStampIcon();
+            applicationInterface.getDrawPreview().updateSettings();
+            preview.showToast(stamp_toast, value ? R.string.stamp_enabled : R.string.stamp_disabled);
 
-        mainUI.updateStampIcon();
-        applicationInterface.getDrawPreview().updateSettings();
-        preview.showToast(stamp_toast, value ? R.string.stamp_enabled : R.string.stamp_disabled);
     }
 
     public void clickedAutoLevel(View view) {
@@ -1340,51 +1416,31 @@ public class MainActivity extends Activity {
     }
 
     public void clickedAudioControl(View view) {
-        if( MyDebug.LOG )
-            Log.d(TAG, "clickedAudioControl");
-        // check hasAudioControl just in case!
-        if( !hasAudioControl() ) {
-            if( MyDebug.LOG )
-                Log.e(TAG, "clickedAudioControl, but hasAudioControl returns false!");
-            return;
-        }
-        this.closePopup();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String audio_control = sharedPreferences.getString(PreferenceKeys.AudioControlPreferenceKey, "none");
-        if( audio_control.equals("voice") && speechControl.hasSpeechRecognition() ) {
-            if( speechControl.isStarted() ) {
-                speechControl.stopListening();
-            }
-            else {
-                boolean has_audio_permission = true;
-                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
-                    // we restrict the checks to Android 6 or later just in case, see note in LocationSupplier.setupLocationListener()
-                    if( MyDebug.LOG )
-                        Log.d(TAG, "check for record audio permission");
-                    if( ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ) {
-                        if( MyDebug.LOG )
-                            Log.d(TAG, "record audio permission not available");
-                        applicationInterface.requestRecordAudioPermission();
-                        has_audio_permission = false;
-                    }
+        Log.d(TAG,"clickedAudioControl");
+        if(! isDynamicFeatureDownloaded(DYNAMIC_FEATURE_AudioControl))
+        {
+            AlertDialog.Builder bb = new AlertDialog.Builder(this);
+            bb.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface arg0, int arg1)
+                {
+                    downloadFeature(DYNAMIC_FEATURE_AudioControl);
                 }
-                if( has_audio_permission ) {
-                    String toast_string = this.getResources().getString(R.string.speech_recognizer_started) + "\n" +
-                            this.getResources().getString(R.string.speech_recognizer_extra_info);
-                    preview.showToast(audio_control_toast, toast_string);
-                    speechControl.startSpeechRecognizerIntent();
-                    speechControl.speechRecognizerStarted();
+            });
+            bb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
                 }
-            }
+            });
+            bb.setMessage("Do you want to down load the AudioControl Feature?");
+            bb.setTitle("Download Dynamic Feature");
+            bb.show();
         }
-        else if( audio_control.equals("noise") ){
-            if( audio_listener != null ) {
-                freeAudioListener(false);
-            }
-            else {
-                startAudioListener();
-            }
+        else {
+            Intent intent = new Intent().setClassName(this, "com.example.audiocontrol.AudioControlService");
+            this.startService(intent);
         }
+
     }
 
     /* Returns the cameraId that the "Switch camera" button will switch to.
@@ -1600,6 +1656,32 @@ public class MainActivity extends Activity {
                     //case "preference_hdr_save_expo": // we need to update if this is changed, as it affects whether we request RAW or not in HDR mode when RAW is enabled
                 case "preference_front_camera_mirror":
                 case "preference_stamp":
+                    if(applicationInterface.getStampPref().equals("preference_stamp_yes")) {
+                        if (!isDynamicFeatureDownloaded(DYNAMIC_FEATURE_StampPhoto)) {
+                            AlertDialog.Builder bb = new AlertDialog.Builder(SecondClass.mActivityRef.get());
+                            bb.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface arg0, int arg1) {
+                                    downloadFeature(DYNAMIC_FEATURE_StampPhoto);
+                                }
+                            });
+                            bb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                            bb.setMessage("Do you want to down load the StampPhoto Feature?");
+                            bb.setTitle("Download Dynamic Feature");
+                            bb.show();
+                            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SecondClass.mActivityRef.get());
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(PreferenceKeys.StampPreferenceKey, "preference_stamp_no");
+                            editor.apply();
+                            mainUI.updateStampIcon();
+                            applicationInterface.getDrawPreview().updateSettings();
+                        }
+
+                    }
                 case "preference_stamp_dateformat":
                 case "preference_stamp_timeformat":
                 case "preference_stamp_gpsformat":
@@ -2077,7 +2159,7 @@ public class MainActivity extends Activity {
     }
 
     public MyPreferenceFragment getPreferenceFragment() {
-        return (MyPreferenceFragment)getFragmentManager().findFragmentByTag("PREFERENCE_FRAGMENT");
+        return (MyPreferenceFragment) getFragmentManager().findFragmentByTag("PREFERENCE_FRAGMENT");
     }
 
     private boolean settingsIsOpen() {
@@ -2702,98 +2784,35 @@ public class MainActivity extends Activity {
     public void clickedGallery(View view) {
         if( MyDebug.LOG )
             Log.d(TAG, "clickedGallery");
-        openGallery();
+        if(! isDynamicFeatureDownloaded(DYNAMIC_FEATURE_Gallery))
+        {
+            AlertDialog.Builder bb = new AlertDialog.Builder(this);
+            bb.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface arg0, int arg1)
+                {
+                    downloadFeature(DYNAMIC_FEATURE_Gallery);
+                }
+            });
+            bb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+            bb.setMessage("Do you want to down load the Gallery Feature?");
+            bb.setTitle("Download Dynamic Feature");
+            bb.show();
+
+        }
+        else {
+            Intent intent = new Intent().setClassName(this,"com.example.gallery.GalleryActivity");
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            this.startActivity(intent);
+            //openGallery();
+        }
     }
 
-    private void openGallery() {
-        if( MyDebug.LOG )
-            Log.d(TAG, "openGallery");
-        //Intent intent = new Intent(Intent.ACTION_VIEW, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        Uri uri = applicationInterface.getStorageUtils().getLastMediaScanned();
-        boolean is_raw = false; // note that getLastMediaScanned() will never return RAW images, as we only record JPEGs
-        if( uri == null ) {
-            if( MyDebug.LOG )
-                Log.d(TAG, "go to latest media");
-            StorageUtils.Media media = applicationInterface.getStorageUtils().getLatestMedia();
-            if( media != null ) {
-                uri = media.uri;
-                is_raw = media.path != null && media.path.toLowerCase(Locale.US).endsWith(".dng");
-            }
-        }
 
-        if( uri != null ) {
-            // check uri exists
-            if( MyDebug.LOG ) {
-                Log.d(TAG, "found most recent uri: " + uri);
-                Log.d(TAG, "is_raw: " + is_raw);
-            }
-            try {
-                ContentResolver cr = getContentResolver();
-                ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
-                if( pfd == null ) {
-                    if( MyDebug.LOG )
-                        Log.d(TAG, "uri no longer exists (1): " + uri);
-                    uri = null;
-                    is_raw = false;
-                }
-                else {
-                    pfd.close();
-                }
-            }
-            catch(IOException e) {
-                if( MyDebug.LOG )
-                    Log.d(TAG, "uri no longer exists (2): " + uri);
-                uri = null;
-                is_raw = false;
-            }
-        }
-        if( uri == null ) {
-            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            is_raw = false;
-        }
-        if( !is_test ) {
-            // don't do if testing, as unclear how to exit activity to finish test (for testGallery())
-            if( MyDebug.LOG )
-                Log.d(TAG, "launch uri:" + uri);
-            final String REVIEW_ACTION = "com.android.camera.action.REVIEW";
-            boolean done = false;
-            if( !is_raw ) {
-                // REVIEW_ACTION means we can view video files without autoplaying
-                // however, Google Photos at least has problems with going to a RAW photo (in RAW only mode),
-                // unless we first pause and resume Open Camera
-                if( MyDebug.LOG )
-                    Log.d(TAG, "try REVIEW_ACTION");
-                try {
-                    Intent intent = new Intent(REVIEW_ACTION, uri);
-                    this.startActivity(intent);
-                    done = true;
-                }
-                catch(ActivityNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-            if( !done ) {
-                if( MyDebug.LOG )
-                    Log.d(TAG, "try ACTION_VIEW");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                // see http://stackoverflow.com/questions/11073832/no-activity-found-to-handle-intent - needed to fix crash if no gallery app installed
-                //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("blah")); // test
-                if( intent.resolveActivity(getPackageManager()) != null ) {
-                    try {
-                        this.startActivity(intent);
-                    }
-                    catch(SecurityException e2) {
-                        // have received this crash from Google Play - don't display a toast, simply do nothing
-                        Log.e(TAG, "SecurityException from ACTION_VIEW startActivity");
-                        e2.printStackTrace();
-                    }
-                }
-                else{
-                    preview.showToast(null, R.string.no_gallery_app);
-                }
-            }
-        }
-    }
 
     /** Opens the Storage Access Framework dialog to select a folder for save location.
      * @param from_preferences Whether called from the Preferences
@@ -4184,63 +4203,7 @@ public class MainActivity extends Activity {
         mainUI.audioControlStopped();
     }
 
-    private void startAudioListener() {
-        if( MyDebug.LOG )
-            Log.d(TAG, "startAudioListener");
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
-            // we restrict the checks to Android 6 or later just in case, see note in LocationSupplier.setupLocationListener()
-            if( MyDebug.LOG )
-                Log.d(TAG, "check for record audio permission");
-            if( ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ) {
-                if( MyDebug.LOG )
-                    Log.d(TAG, "record audio permission not available");
-                applicationInterface.requestRecordAudioPermission();
-                return;
-            }
-        }
 
-        MyAudioTriggerListenerCallback callback = new MyAudioTriggerListenerCallback(this);
-        audio_listener = new AudioListener(callback);
-        if( audio_listener.status() ) {
-            preview.showToast(audio_control_toast, R.string.audio_listener_started);
-
-            audio_listener.start();
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            String sensitivity_pref = sharedPreferences.getString(PreferenceKeys.AudioNoiseControlSensitivityPreferenceKey, "0");
-            int audio_noise_sensitivity;
-            switch(sensitivity_pref) {
-                case "3":
-                    audio_noise_sensitivity = 50;
-                    break;
-                case "2":
-                    audio_noise_sensitivity = 75;
-                    break;
-                case "1":
-                    audio_noise_sensitivity = 125;
-                    break;
-                case "-1":
-                    audio_noise_sensitivity = 150;
-                    break;
-                case "-2":
-                    audio_noise_sensitivity = 200;
-                    break;
-                case "-3":
-                    audio_noise_sensitivity = 400;
-                    break;
-                default:
-                    // default
-                    audio_noise_sensitivity = 100;
-                    break;
-            }
-            callback.setAudioNoiseSensitivity(audio_noise_sensitivity);
-            mainUI.audioControlStarted();
-        }
-        else {
-            audio_listener.release(true); // shouldn't be needed, but just to be safe
-            audio_listener = null;
-            preview.showToast(null, R.string.audio_listener_failed);
-        }
-    }
 
     public boolean hasAudioControl() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -4319,7 +4282,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    ToastBoxer getAudioControlToast() {
+    public ToastBoxer getAudioControlToast() {
         return this.audio_control_toast;
     }
 

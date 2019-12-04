@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    package="com.example.audiocontrol">
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <dist:module
+        dist:instant="false"
+        dist:title="@string/title_audiocontrol">
+        <dist:delivery>
+            <dist:on-demand />
+        </dist:delivery>
+        <dist:fusing dist:include="true" />
+    </dist:module>
+    <application android:theme="@style/AppTheme">
+        <service android:name=".AudioControlService"></service>
+    </application>
+</manifest>
+

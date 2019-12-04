@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.Queue;
 
 import android.annotation.TargetApi;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
@@ -44,7 +46,9 @@ import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.util.Range;
 import android.util.SizeF;
@@ -1240,7 +1244,7 @@ public class CameraController2 extends CameraController {
                         Log.d(TAG, "can now process the image");
                     // should call processImage() on UI thread, to be consistent with onImageAvailable()->processImage()
                     // important to avoid crash when pause preview is option, tested in testTakePhotoRawWaitCaptureResult()
-                    final Activity activity = (Activity)context;
+                    final AppCompatActivity activity = (AppCompatActivity)context;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -5357,7 +5361,7 @@ public class CameraController2 extends CameraController {
                     return;
                 }
                 if( test_release_during_photo ) {
-                    final Activity activity = (Activity)context;
+                    final AppCompatActivity activity = (AppCompatActivity)context;
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -7416,7 +7420,7 @@ public class CameraController2 extends CameraController {
             // Also needs to be run on UI thread.
             // Needed for testContinuousPictureFocusRepeat on Nexus 7; also testable on other devices via
             // testContinuousPictureFocusRepeatWaitCaptureResult.
-            final Activity activity = (Activity)context;
+            final AppCompatActivity activity = (AppCompatActivity)context;
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

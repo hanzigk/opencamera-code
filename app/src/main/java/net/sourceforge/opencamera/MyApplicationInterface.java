@@ -140,7 +140,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
     // camera properties that aren't saved even in the bundle; these should be initialised/reset in reset()
     private int zoom_factor; // don't save zoom, as doing so tends to confuse users; other camera applications don't seem to save zoom when pause/resuming
 
-    MyApplicationInterface(MainActivity main_activity, Bundle savedInstanceState) {
+    public MyApplicationInterface(MainActivity main_activity, Bundle savedInstanceState) {
         long debug_time = 0;
         if( MyDebug.LOG ) {
             Log.d(TAG, "MyApplicationInterface");
@@ -212,7 +212,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
         return gyroSensor;
     }
 
-    StorageUtils getStorageUtils() {
+    public StorageUtils getStorageUtils() {
         return storageUtils;
     }
 
@@ -2738,7 +2738,7 @@ public class MyApplicationInterface extends BasicApplicationInterface {
      *                  resultant image, this indicates if all the base images should also be saved
      *                  as separate images.
      * @param images The set of images.
-     * @param current_date The current date/time stamp for the images.
+     * @param current_date The currents date/time stamp for the images.
      * @return Whether saving was successful.
      */
     private boolean saveImage(boolean save_expo, List<byte []> images, Date current_date) {

@@ -1,10 +1,8 @@
 package net.sourceforge.opencamera;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,8 +22,9 @@ import android.renderscript.Script;
 import android.renderscript.ScriptIntrinsicHistogram;
 //import android.renderscript.ScriptIntrinsicResize;
 import android.renderscript.Type;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Log;
+
 
 public class HDRProcessor {
     private static final String TAG = "HDRProcessor";
@@ -1032,7 +1031,7 @@ public class HDRProcessor {
             Log.d(TAG, "time for processSingleImage: " + (System.currentTimeMillis() - time_s));
     }
 
-    void brightenImage(Bitmap bitmap, int brightness, int max_brightness, int brightness_target) {
+    public void brightenImage(Bitmap bitmap, int brightness, int max_brightness, int brightness_target) {
         if( MyDebug.LOG ) {
             Log.d(TAG, "brightenImage");
             Log.d(TAG, "brightness: " + brightness);
@@ -1673,7 +1672,7 @@ public class HDRProcessor {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    void autoAlignment(int[] offsets_x, int[] offsets_y, int width, int height, List<Bitmap> bitmaps, int base_bitmap, boolean use_mtb, int max_align_scale) {
+    public void autoAlignment(int[] offsets_x, int[] offsets_y, int width, int height, List<Bitmap> bitmaps, int base_bitmap, boolean use_mtb, int max_align_scale) {
         if( MyDebug.LOG )
             Log.d(TAG, "autoAlignment");
         initRenderscript();
@@ -2237,7 +2236,7 @@ public class HDRProcessor {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    void adjustHistogram(Allocation allocation_in, Allocation allocation_out, int width, int height, float hdr_alpha, int n_tiles, boolean ce_preserve_blacks, long time_s) {
+    public void adjustHistogram(Allocation allocation_in, Allocation allocation_out, int width, int height, float hdr_alpha, int n_tiles, boolean ce_preserve_blacks, long time_s) {
         if( MyDebug.LOG )
             Log.d(TAG, "adjustHistogram");
         final boolean adjust_histogram = false;
@@ -2639,11 +2638,11 @@ public class HDRProcessor {
         return histogram;
     }
 
-    static class HistogramInfo {
+    public static class HistogramInfo {
         final int total;
         final int mean_brightness;
-        final int median_brightness;
-        final int max_brightness;
+        public final int median_brightness;
+        public final int max_brightness;
 
         HistogramInfo(int total, int mean_brightness, int median_brightness, int max_brightness) {
             this.total = total;
@@ -2653,7 +2652,7 @@ public class HDRProcessor {
         }
     }
 
-    HistogramInfo getHistogramInfo(int[] histo) {
+    public HistogramInfo getHistogramInfo(int[] histo) {
         int total = 0;
         for(int value : histo)
             total += value;

@@ -34,8 +34,8 @@ import android.provider.MediaStore.Video;
 import android.provider.MediaStore.Images.ImageColumns;
 import android.provider.MediaStore.Video.VideoColumns;
 import android.provider.OpenableColumns;
-import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import android.system.Os;
 import android.system.StructStatVfs;
 import android.util.Log;
@@ -65,7 +65,7 @@ public class StorageUtils {
         this.applicationInterface = applicationInterface;
     }
 
-    Uri getLastMediaScanned() {
+    public Uri getLastMediaScanned() {
         return last_media_scanned;
     }
 
@@ -760,13 +760,13 @@ public class StorageUtils {
         return createOutputFileSAF(mediaFilename, mimeType);
     }
 
-    static class Media {
+    public static class Media {
         final long id;
         final boolean video;
-        final Uri uri;
+        public final Uri uri;
         final long date;
         final int orientation;
-        final String path;
+        public final String path;
 
         Media(long id, boolean video, Uri uri, long date, int orientation, String path) {
             this.id = id;
@@ -924,7 +924,7 @@ public class StorageUtils {
         return media;
     }
 
-    Media getLatestMedia() {
+    public Media getLatestMedia() {
         Media image_media = getLatestMedia(false);
         Media video_media = getLatestMedia(true);
         Media media = null;

@@ -4,9 +4,12 @@ import net.sourceforge.opencamera.cameracontroller.CameraController;
 import net.sourceforge.opencamera.preview.Preview;
 import net.sourceforge.opencamera.ui.FolderChooserDialog;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
+
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.ClipData;
@@ -313,7 +316,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements OnShared
                         // we check done_raw_info every time, so that this works if the user selects RAW again without leaving and returning to Settings
                         boolean done_raw_info = sharedPreferences.contains(PreferenceKeys.RawInfoPreferenceKey);
                         if( !done_raw_info ) {
-                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(MyPreferenceFragment.this.getActivity());
+                            androidx.appcompat.app.AlertDialog.Builder alertDialog = new AlertDialog.Builder(MyPreferenceFragment.this.getActivity());
                             alertDialog.setTitle(R.string.preference_raw);
                             alertDialog.setMessage(R.string.raw_info);
                             alertDialog.setPositiveButton(android.R.string.ok, null);
@@ -1473,7 +1476,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements OnShared
                     if( pref.getKey().equals("preference_reset") ) {
                         if( MyDebug.LOG )
                             Log.d(TAG, "user clicked reset settings");
-                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MyPreferenceFragment.this.getActivity());
+                        androidx.appcompat.app.AlertDialog.Builder alertDialog = new AlertDialog.Builder(MyPreferenceFragment.this.getActivity());
                         alertDialog.setIcon(android.R.drawable.ic_dialog_alert);
                         alertDialog.setTitle(R.string.preference_reset);
                         alertDialog.setMessage(R.string.preference_reset_question);
@@ -1531,7 +1534,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements OnShared
         /*MainActivity main_activity = (MainActivity)MyPreferenceFragment.this.getActivity();
         main_activity.launchOnlinePrivacyPolicy();*/
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MyPreferenceFragment.this.getActivity());
+        AlertDialog.Builder alertDialog = new androidx.appcompat.app.AlertDialog.Builder(MyPreferenceFragment.this.getActivity());
         alertDialog.setTitle(R.string.preference_privacy_policy);
         alertDialog.setMessage(R.string.preference_privacy_policy_text);
         alertDialog.setPositiveButton(android.R.string.ok, null);
@@ -1568,7 +1571,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements OnShared
             alertDialog.setTitle(getActivity().getResources().getString(title_id));
             alertDialog.setMessage(scanner.next());
             alertDialog.setPositiveButton(android.R.string.ok, null);
-            final AlertDialog alert = alertDialog.create();
+            final androidx.appcompat.app.AlertDialog alert = alertDialog.create();
             // AlertDialog.Builder.setOnDismissListener() requires API level 17, so do it this way instead
             alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;

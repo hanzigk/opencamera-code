@@ -10,13 +10,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -43,7 +43,7 @@ public class FolderChooserDialog extends DialogFragment {
 
     private File start_folder = new File("");
     private File current_folder;
-    private AlertDialog folder_dialog;
+    private androidx.appcompat.app.AlertDialog folder_dialog;
     private ListView list;
     private String chosen_folder;
     private String chosen_file; // only set if mode_folder==false
@@ -128,7 +128,7 @@ public class FolderChooserDialog extends DialogFragment {
             }
         });
         // good to use as short a text as possible for the icons, to reduce chance that the three buttons will have to appear on top of each other rather than in a row, in portrait mode
-        AlertDialog.Builder folder_dialog_builder = new AlertDialog.Builder(getActivity())
+        AlertDialog.Builder folder_dialog_builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity())
                 //.setIcon(R.drawable.alert_dialog_icon)
                 .setView(list);
         if( mode_folder ) {
@@ -157,7 +157,7 @@ public class FolderChooserDialog extends DialogFragment {
                     });
                 }
                 if( show_new_folder_button ) {
-                    Button b_neutral = folder_dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                    Button b_neutral = folder_dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEUTRAL);
                     b_neutral.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

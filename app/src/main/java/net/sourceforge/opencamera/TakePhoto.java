@@ -1,9 +1,13 @@
 package net.sourceforge.opencamera;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /** Entry Activity for the "take photo" widget (see MyWidgetProviderTakePhoto).
  *  This redirects to MainActivity, but uses an intent extra/bundle to pass the

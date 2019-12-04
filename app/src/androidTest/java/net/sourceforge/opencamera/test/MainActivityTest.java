@@ -1,10 +1,8 @@
 package net.sourceforge.opencamera.test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -56,7 +54,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.renderscript.Allocation;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.util.Log;
@@ -9239,7 +9237,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         FolderChooserDialog fragment = new FolderChooserDialog();
 		fragment.setStartFolder(mActivity.getImageFolder());
-        fragment.show(mActivity.getFragmentManager(), "FOLDER_FRAGMENT");
+        fragment.show(mActivity.getSupportFragmentManager(), "FOLDER_FRAGMENT");
         Thread.sleep(1000); // wait until folderchooser started up
         Log.d(TAG, "started folderchooser");
         assertTrue(fragment.getCurrentFolder() != null);
@@ -9264,7 +9262,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         FolderChooserDialog fragment = new FolderChooserDialog();
 		fragment.setStartFolder(mActivity.getImageFolder());
-        fragment.show(mActivity.getFragmentManager(), "FOLDER_FRAGMENT");
+        fragment.show(mActivity.getSupportFragmentManager(), "FOLDER_FRAGMENT");
         Thread.sleep(1000); // wait until folderchooser started up
         Log.d(TAG, "started folderchooser");
         assertTrue(fragment.getCurrentFolder() != null);

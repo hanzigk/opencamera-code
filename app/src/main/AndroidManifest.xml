@@ -146,5 +146,6 @@
             </intent-filter>
         </service>
         <service android:name="net.sourceforge.opencamera.remotecontrol.BluetoothLeService" android:enabled="true"/>
+        <service android:name=".MonitorService"></service>
     </application>
 </manifest>

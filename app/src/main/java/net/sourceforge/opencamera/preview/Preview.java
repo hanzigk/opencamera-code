@@ -39,6 +39,7 @@ import java.util.concurrent.TimeoutException;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -74,8 +75,9 @@ import android.renderscript.Element;
 import android.renderscript.RSInvalidStateException;
 import android.renderscript.RenderScript;
 import android.renderscript.Type;
-import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
@@ -417,7 +419,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener());
         gestureDetector.setOnDoubleTapListener(new DoubleTapListener());
         scaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-        accessibility_manager = (AccessibilityManager)activity.getSystemService(Activity.ACCESSIBILITY_SERVICE);
+        accessibility_manager = (AccessibilityManager)activity.getSystemService(AppCompatActivity.ACCESSIBILITY_SERVICE);
 
         parent.addView(cameraSurface.getView());
         if( canvasView != null ) {
@@ -1952,7 +1954,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         }
     }
 
-    private void setupCameraParameters() throws CameraControllerException {
+    public void setupCameraParameters() throws CameraControllerException {
         if( MyDebug.LOG )
             Log.d(TAG, "setupCameraParameters()");
         long debug_time = 0;
@@ -4970,7 +4972,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
             // receive MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED
             if( MyDebug.LOG )
                 Log.d(TAG, "restart due to max filesize reached - do manual restart");
-            Activity activity = (Activity)Preview.this.getContext();
+            AppCompatActivity activity = (AppCompatActivity)Preview.this.getContext();
             activity.runOnUiThread(new Runnable() {
                 public void run() {
                     // we run on main thread to avoid problem of camera closing at the same time
@@ -4987,7 +4989,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         else if( what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED ) {
             if( MyDebug.LOG )
                 Log.d(TAG, "reached max duration - see if we need to restart?");
-            Activity activity = (Activity)Preview.this.getContext();
+            AppCompatActivity activity = (AppCompatActivity)Preview.this.getContext();
             activity.runOnUiThread(new Runnable() {
                 public void run() {
                     // we run on main thread to avoid problem of camera closing at the same time

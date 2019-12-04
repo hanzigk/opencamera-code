@@ -34,9 +34,16 @@ android {
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
     //useLibrary 'android.test.mock'
+
+
+    dynamicFeatures = [":Gallery", ":AudioControl", ":StampPhoto"]
+
+
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.play:core:1.6.4'
     testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
 }

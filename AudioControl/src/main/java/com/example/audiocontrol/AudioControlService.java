@@ -8,16 +8,16 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import androidx.core.app.ActivityCompat;
+
 import androidx.core.content.ContextCompat;
 import android.util.Log;
-import net.sourceforge.opencamera.R;
-import net.sourceforge.opencamera.MainActivity;
-import net.sourceforge.opencamera.MyDebug;
-import net.sourceforge.opencamera.PreferenceKeys;
-import net.sourceforge.opencamera.ToastBoxer;
+import net.sourceforge.opencamerahzz.R;
+import net.sourceforge.opencamerahzz.MainActivity;
+import net.sourceforge.opencamerahzz.MyDebug;
+import net.sourceforge.opencamerahzz.PreferenceKeys;
+import net.sourceforge.opencamerahzz.ToastBoxer;
 
-import static net.sourceforge.opencamera.MainActivity.SecondClass;
+import static net.sourceforge.opencamerahzz.MainActivity.SecondClass;
 
 public class AudioControlService extends Service {
     String TAG = "AudioControlService";

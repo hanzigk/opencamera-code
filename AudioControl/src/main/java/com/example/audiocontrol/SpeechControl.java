@@ -11,10 +11,10 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
 
-import net.sourceforge.opencamera.MainActivity;
-import net.sourceforge.opencamera.MyDebug;
-import net.sourceforge.opencamera.PreferenceKeys;
-import net.sourceforge.opencamera.ToastBoxer;
+import net.sourceforge.opencamerahzz.MainActivity;
+import net.sourceforge.opencamerahzz.MyDebug;
+import net.sourceforge.opencamerahzz.PreferenceKeys;
+import net.sourceforge.opencamerahzz.ToastBoxer;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -257,7 +257,7 @@ class SpeechControl {
                 });
 
                 if( !main_activity.getMainUI().inImmersiveMode() ) {
-                    View speechRecognizerButton = main_activity.findViewById(net.sourceforge.opencamera.R.id.audio_control);
+                    View speechRecognizerButton = main_activity.findViewById(net.sourceforge.opencamerahzz.R.id.audio_control);
                     speechRecognizerButton.setVisibility(View.VISIBLE);
                 }
             }
@@ -289,7 +289,7 @@ class SpeechControl {
             Log.d(TAG, "stopSpeechRecognizer");
         if( speechRecognizer != null ) {
             speechRecognizerStopped();
-            View speechRecognizerButton = main_activity.findViewById(net.sourceforge.opencamera.R.id.audio_control);
+            View speechRecognizerButton = main_activity.findViewById(net.sourceforge.opencamerahzz.R.id.audio_control);
             speechRecognizerButton.setVisibility(View.GONE);
             freeSpeechRecognizer();
         }

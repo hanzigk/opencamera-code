@@ -14,8 +14,8 @@ import android.util.Log;
 
 
 
-import net.sourceforge.opencamera.MyDebug;
-import net.sourceforge.opencamera.preview.Preview;
+import net.sourceforge.opencamerahzz.MyDebug;
+import net.sourceforge.opencamerahzz.preview.Preview;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -124,7 +124,7 @@ public class GalleryActivity extends Activity {
                     }
                 }
                 else{
-                    preview.showToast(null, net.sourceforge.opencamera.R.string.no_gallery_app);
+                    preview.showToast(null, net.sourceforge.opencamerahzz.R.string.no_gallery_app);
                 }
             }
         }

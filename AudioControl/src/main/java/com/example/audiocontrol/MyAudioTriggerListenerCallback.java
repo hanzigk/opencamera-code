@@ -4,9 +4,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import net.sourceforge.opencamera.MainActivity;
-import net.sourceforge.opencamera.MyDebug;
-import net.sourceforge.opencamera.PreferenceKeys;
+import net.sourceforge.opencamerahzz.MainActivity;
+import net.sourceforge.opencamerahzz.MyDebug;
+import net.sourceforge.opencamerahzz.PreferenceKeys;
 
 /** Handles the audio "noise" trigger option.
  */

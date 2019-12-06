@@ -5,7 +5,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import net.sourceforge.opencamera.MyDebug;
+import net.sourceforge.opencamerahzz.MyDebug;
 
 /** Sets up a listener to listen for noise level.
  */

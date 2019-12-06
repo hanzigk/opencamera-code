@@ -30,8 +30,8 @@ import android.system.Os;
 import android.system.StructStatVfs;
 import android.util.Log;
 
-import net.sourceforge.opencamera.MyDebug;
-import net.sourceforge.opencamera.PreferenceKeys;
+import net.sourceforge.opencamerahzz.MyDebug;
+import net.sourceforge.opencamerahzz.PreferenceKeys;
 
 import java.io.File;
 import java.io.FileNotFoundException;

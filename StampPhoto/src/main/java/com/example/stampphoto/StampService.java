@@ -3,25 +3,21 @@ package com.example.stampphoto;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import net.sourceforge.opencamera.ImageSaver;
-import net.sourceforge.opencamera.MainActivity;
-import net.sourceforge.opencamera.MyApplicationInterface;
-import net.sourceforge.opencamera.MyDebug;
-import net.sourceforge.opencamera.TextFormatter;
+import net.sourceforge.opencamerahzz.ImageSaver;
+import net.sourceforge.opencamerahzz.MainActivity;
+import net.sourceforge.opencamerahzz.MyApplicationInterface;
+import net.sourceforge.opencamerahzz.MyDebug;
+import net.sourceforge.opencamerahzz.TextFormatter;
 
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -66,7 +62,7 @@ public class StampService extends Service {
                 Log.d(TAG, "decode bitmap in order to stamp info");
             bitmap = imageSaver.loadBitmapWithRotation(data, true, exifTempFile);
             if (bitmap == null) {
-                mainActivity.getPreview().showToast(null, net.sourceforge.opencamera.R.string.failed_to_stamp);
+                mainActivity.getPreview().showToast(null, net.sourceforge.opencamerahzz.R.string.failed_to_stamp);
                 System.gc();
             }
         }

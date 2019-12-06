@@ -6,8 +6,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import net.sourceforge.opencamera.MyDebug;
-import net.sourceforge.opencamera.preview.BasicApplicationInterface;
+import net.sourceforge.opencamerahzz.MyDebug;
+import net.sourceforge.opencamerahzz.preview.BasicApplicationInterface;
 
 import java.io.File;
 import java.io.IOException;

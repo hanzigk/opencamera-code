@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import android.util.Log;
 
-import net.sourceforge.opencamera.MainActivity;
-import net.sourceforge.opencamera.MyDebug;
+import net.sourceforge.opencamerahzz.MainActivity;
+import net.sourceforge.opencamerahzz.MyDebug;
 
 /** Android 6+ permission handling:
  */
@@ -51,25 +51,25 @@ public class PermissionHandler {
                 if (MyDebug.LOG)
                     Log.d(TAG, "display rationale for camera permission");
                 permissions = new String[]{Manifest.permission.CAMERA};
-                message_id = net.sourceforge.opencamera.R.string.permission_rationale_camera;
+                message_id = net.sourceforge.opencamerahzz.R.string.permission_rationale_camera;
                 break;
             case MY_PERMISSIONS_REQUEST_STORAGE:
                 if (MyDebug.LOG)
                     Log.d(TAG, "display rationale for storage permission");
                 permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                message_id = net.sourceforge.opencamera.R.string.permission_rationale_storage;
+                message_id = net.sourceforge.opencamerahzz.R.string.permission_rationale_storage;
                 break;
             case MY_PERMISSIONS_REQUEST_RECORD_AUDIO:
                 if (MyDebug.LOG)
                     Log.d(TAG, "display rationale for record audio permission");
                 permissions = new String[]{Manifest.permission.RECORD_AUDIO};
-                message_id = net.sourceforge.opencamera.R.string.permission_rationale_record_audio;
+                message_id = net.sourceforge.opencamerahzz.R.string.permission_rationale_record_audio;
                 break;
             case MY_PERMISSIONS_REQUEST_LOCATION:
                 if (MyDebug.LOG)
                     Log.d(TAG, "display rationale for location permission");
                 permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-                message_id = net.sourceforge.opencamera.R.string.permission_rationale_location;
+                message_id = net.sourceforge.opencamerahzz.R.string.permission_rationale_location;
                 break;
             default:
                 if (MyDebug.LOG)
@@ -81,7 +81,7 @@ public class PermissionHandler {
         if( ok ) {
             final String [] permissions_f = permissions;
             new AlertDialog.Builder(main_activity)
-            .setTitle(net.sourceforge.opencamera.R.string.permission_rationale_title)
+            .setTitle(net.sourceforge.opencamerahzz.R.string.permission_rationale_title)
             .setMessage(message_id)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .setPositiveButton(android.R.string.ok, null)

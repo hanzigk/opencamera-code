@@ -961,6 +961,5 @@
     </string>
     <string name="title_audiocontrol">Audio Control</string>
     <string name="title_gallery">Gallery</string>
-    <string name="title_hdr">HDR</string>
     <string name="title_stampphoto">StampPhoto</string>
 </resources>
